@@ -53,6 +53,9 @@ class TCPClient(Comm):
         None
 
         """
+        if not data:
+            return None
+
         logging.debug("=> %s", data.hex())
         length: bytes = int.to_bytes(len(data), 4, byteorder="big")
         self.socket.send(length + data)
@@ -92,7 +95,7 @@ class TCPClient(Comm):
         """
         self.send(data)
 
-        return self.recv()  # blocking IO
+        return self.recv() if data else None  # blocking IO
 
     def close(self) -> None:
         """Close connection to TCP socket `self.socket`.

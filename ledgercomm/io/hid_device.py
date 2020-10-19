@@ -75,6 +75,9 @@ class HID(Comm):
         None
 
         """
+        if not data:
+            return None
+
         data = int.to_bytes(len(data), 2, byteorder="big") + data
         offset: int = 0
         seq_idx: int = 0
@@ -140,7 +143,7 @@ class HID(Comm):
         """
         self.send(data)
 
-        return self.recv()
+        return self.recv() if data else None  # blocking IO
 
     def close(self) -> None:
         """Close connection to HID device `self.device`.

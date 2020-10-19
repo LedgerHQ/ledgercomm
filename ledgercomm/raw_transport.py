@@ -59,7 +59,7 @@ class RawTransport:
         if isinstance(apdus, str):
             apdus = bytes.fromhex(apdus)
 
-        self.com.send(apdus)
+        self.com.send(apdus) if apdus else None
 
     def recv(self) -> Tuple[int, bytes]:
         """Receive data from `self.com`.
@@ -93,7 +93,7 @@ class RawTransport:
         if isinstance(apdus, str):
             apdus = bytes.fromhex(apdus)
 
-        return self.com.exchange(apdus)
+        return self.com.exchange(apdus) if apdus else None
 
     def close(self) -> None:
         """Close `self.com` interface.
