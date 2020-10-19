@@ -1,0 +1,1 @@
+"""ledegercomm.cli module."""
