@@ -31,7 +31,7 @@ setup(
     entry_points={
         "console_scripts": [
             "ledgercomm-repl = ledgercomm.cli.repl:main",
-            "ledgercomm-parse = ledgercomm.cli.parse:main"
+            "ledgercomm-parser = ledgercomm.cli.parser:main"
         ],
     },
     zip_safe=True
