@@ -40,7 +40,7 @@ class TCPClient(Comm):
         self.socket.connect((self.server, self.port))
         self.__opened: bool = True
 
-    def send(self, data: bytes) -> None:
+    def send(self, data: bytes) -> int:
         """Send `data` through TCP socket `self.socket`.
 
         Parameters
@@ -50,15 +50,17 @@ class TCPClient(Comm):
 
         Returns
         -------
-        None
+        int
+            Total lenght of data sent through TCP socket.
 
         """
         if not data:
-            return None
+            raise Exception("Can't send empty data!")
 
         logging.debug("=> %s", data.hex())
-        length: bytes = int.to_bytes(len(data), 4, byteorder="big")
-        self.socket.send(length + data)
+        data_len: bytes = int.to_bytes(len(data), 4, byteorder="big")
+
+        return self.socket.send(data_len + data)
 
     def recv(self) -> Tuple[int, bytes]:
         """Receive data through TCP socket `self.socket`.
@@ -95,7 +97,7 @@ class TCPClient(Comm):
         """
         self.send(data)
 
-        return self.recv() if data else None  # blocking IO
+        return self.recv()  # blocking IO
 
     def close(self) -> None:
         """Close connection to TCP socket `self.socket`.

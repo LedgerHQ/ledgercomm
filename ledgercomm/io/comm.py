@@ -8,7 +8,7 @@ class Comm(metaclass=ABCMeta):
     """Abstract class for communication interface."""
 
     @abstractmethod
-    def send(self, data: bytes) -> None:
+    def send(self, data: bytes) -> int:
         """Allow to send raw bytes from the interface."""
         raise NotImplementedError
 

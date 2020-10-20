@@ -5,12 +5,12 @@ try:
 except ImportError:
     IPython = None
 
-from ledgercomm import Transport, RawTransport
+from ledgercomm import Transport
 
 
 def main():
     """Entrypoint of ledgercomm-repl binary."""
-    scope_vars = {"Transport": Transport, "RawTransport": RawTransport}
+    scope_vars = {"Transport": Transport}
     print("Welcome to ledgercomm REPL!")
     IPython.start_ipython(argv=[], user_ns=scope_vars)
 

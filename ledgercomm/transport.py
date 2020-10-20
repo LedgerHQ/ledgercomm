@@ -99,7 +99,7 @@ class Transport:
              p1: int = 0,
              p2: int = 0,
              opt: Optional[int] = None,
-             payload: bytes = b"") -> None:
+             payload: bytes = b"") -> int:
         """Send structured APDUs through `self.com`.
 
         Parameters
@@ -119,14 +119,15 @@ class Transport:
 
         Returns
         -------
-        None
+        int
+            Total lenght of the APDU sent.
 
         """
         header: bytes = Transport.get_header(cla, ins, p1, p2, opt, len(payload))
 
-        self.com.send(header + payload)
+        return self.com.send(header + payload)
 
-    def send_raw(self, apdus: Union[str, bytes]) -> None:
+    def send_raw(self, apdus: Union[str, bytes]) -> int:
         """Send raw `apdus` through `self.com`.
 
         Parameters
@@ -136,13 +137,14 @@ class Transport:
 
         Returns
         -------
-        None
+        Optional[int]
+            Total lenght of APDU sent if any.
 
         """
         if isinstance(apdus, str):
             apdus = bytes.fromhex(apdus)
 
-        self.com.send(apdus) if apdus else None
+        return self.com.send(apdus)
 
     def recv(self) -> Tuple[int, bytes]:
         """Receive data from `self.com`.
@@ -211,7 +213,7 @@ class Transport:
         if isinstance(apdus, str):
             apdus = bytes.fromhex(apdus)
 
-        return self.com.exchange(apdus) if apdus else None
+        return self.com.exchange(apdus)
 
     def close(self) -> None:
         """Close `self.com` interface.

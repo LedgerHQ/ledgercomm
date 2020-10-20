@@ -62,7 +62,7 @@ class HID(Comm):
 
         return devices
 
-    def send(self, data: bytes) -> None:
+    def send(self, data: bytes) -> int:
         """Send `data` through HID device `self.device`.
 
         Parameters
@@ -72,15 +72,17 @@ class HID(Comm):
 
         Returns
         -------
-        None
+        int
+            Total length of data sent to the device.
 
         """
         if not data:
-            return None
+            raise Exception("Can't send empty data!")
 
         data = int.to_bytes(len(data), 2, byteorder="big") + data
         offset: int = 0
         seq_idx: int = 0
+        length: int = 0
 
         while offset < len(data):
             # Header: channel (0x101), tag (0x05), sequence index
@@ -89,9 +91,12 @@ class HID(Comm):
                                  data[offset:offset + 64 - len(header)])
 
             self.device.write(b"\x00" + data_chunk)
+            length += len(data_chunk) + 1
             logging.debug("=> %s", data_chunk.hex())
             offset += 64 - len(header)
             seq_idx += 1
+
+        return length
 
     def recv(self) -> Tuple[int, bytes]:
         """Receive data through HID device `self.device`.
@@ -143,7 +148,7 @@ class HID(Comm):
         """
         self.send(data)
 
-        return self.recv() if data else None  # blocking IO
+        return self.recv()  # blocking IO
 
     def close(self) -> None:
         """Close connection to HID device `self.device`.

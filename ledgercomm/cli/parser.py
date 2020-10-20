@@ -35,7 +35,7 @@ def main():
         help="path of the file within APDUs"
     )
     # stdin subparser
-    parser_stdin = subparsers.add_parser(
+    _ = subparsers.add_parser(
         "stdin",
         help="to read APDUs from stdin"
     )
@@ -93,7 +93,7 @@ def main():
 
     if args.command == "log":
         # TODO: implement Ledger Live log parser
-        raise NotImplemented("Ledger Live log parser is not yet available!")
+        raise NotImplementedError("Ledger Live log parser is not yet available!")
 
     transport.close()
 
