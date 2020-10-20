@@ -98,7 +98,7 @@ class Transport:
              ins: Union[int, enum.IntEnum],
              p1: int = 0,
              p2: int = 0,
-             opt: Optional[int] = None,
+             option: Optional[int] = None,
              payload: bytes = b"") -> int:
         """Send structured APDUs through `self.com`.
 
@@ -112,7 +112,7 @@ class Transport:
             Instruction parameter: P1 (1 byte).
         p2 : int
             Instruction parameter: P2 (1 byte).
-        opt : Optional[int]
+        option : Optional[int]
             Optional parameter: Opt (1 byte).
         payload : bytes
             Payload to send (bytes of variable length).
@@ -123,7 +123,7 @@ class Transport:
             Total lenght of the APDU sent.
 
         """
-        header: bytes = Transport.get_header(cla, ins, p1, p2, opt, len(payload))
+        header: bytes = Transport.get_header(cla, ins, p1, p2, option, len(payload))
 
         return self.com.send(header + payload)
 
@@ -179,7 +179,7 @@ class Transport:
             Instruction parameter: P1 (1 byte).
         p2 : int
             Instruction parameter: P2 (1 byte).
-        opt : Optional[int]
+        option : Optional[int]
             Optional parameter: Opt (1 byte).
         payload : bytes
             Payload to send (bytes of variable length).
