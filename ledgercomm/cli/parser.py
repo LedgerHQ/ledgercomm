@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 from typing import Iterator, Optional
 
-from ledgercomm import RawTransport
+from ledgercomm import Transport
 
 
 def parse_file(filepath: Path, condition: Optional[str]) -> Iterator[str]:
@@ -66,21 +66,21 @@ def main():
     )
     parser.add_argument(
         "--condition",
-        help="Only send APDUs on line starting with condition (default: None)",
+        help="Only send APDUs starting with 'condition' (default: None)",
         default=None
     )
 
     args = parser.parse_args()
 
-    transport = (RawTransport(hid=True, debug=True) if args.hid
-                 else RawTransport(server=args.server, port=args.port, debug=True))
+    transport = (Transport(hid=True, debug=True) if args.hid
+                 else Transport(server=args.server, port=args.port, debug=True))
 
     if args.command == "file":
         filepath: Path = Path(args.filepath)
 
         for apdu in parse_file(filepath, args.condition):  # type: str
             if apdu:
-                transport.exchange(re.sub(r"[^a-fA-F0-9]", "", apdu))
+                transport.exchange_raw(re.sub(r"[^a-fA-F0-9]", "", apdu))
 
     if args.command == "stdin":
         apdu: str = input()
@@ -89,7 +89,7 @@ def main():
             apdu = apdu.replace(args.condition, "").strip()
 
         if apdu:
-            transport.exchange(re.sub(r"[^a-fA-F0-9]", "", apdu))
+            transport.exchange_raw(re.sub(r"[^a-fA-F0-9]", "", apdu))
 
     if args.command == "log":
         # TODO: implement Ledger Live log parser

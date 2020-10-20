@@ -10,9 +10,9 @@ from ledgercomm.io.hid_device import HID
 
 
 class Transport:
-    """Transport factory class to send structured APDUs.
+    """Transport class to send APDUs.
 
-    Allow to communicate using HID device or through TCP
+    Allow to communicate using HID device such as Nano S/X or through TCP
     socket with the Speculos emulator.
 
     Parameters
@@ -126,6 +126,24 @@ class Transport:
 
         self.com.send(header + payload)
 
+    def send_raw(self, apdus: Union[str, bytes]) -> None:
+        """Send raw `apdus` through `self.com`.
+
+        Parameters
+        ----------
+        apdus : Union[str, bytes]
+            Hexstring or bytes with APDUs to be sent through `self.com`.
+
+        Returns
+        -------
+        None
+
+        """
+        if isinstance(apdus, str):
+            apdus = bytes.fromhex(apdus)
+
+        self.com.send(apdus) if apdus else None
+
     def recv(self) -> Tuple[int, bytes]:
         """Receive data from `self.com`.
 
@@ -174,6 +192,26 @@ class Transport:
         header: bytes = Transport.get_header(cla, ins, p1, p2, option, len(payload))
 
         return self.com.exchange(header + payload)
+
+    def exchange_raw(self, apdus: Union[str, bytes]) -> Tuple[int, bytes]:
+        """Send raw `apdus` and wait to receive datas from `self.com`.
+
+        Parameters
+        ----------
+        apdus : Union[str, bytes]
+            Hexstring or bytes of APDUs to send through `self.com`.
+
+        Returns
+        -------
+        Tuple[int, bytes]
+            A pair (sw, response) for the status word (2 bytes represented
+            as int) and the reponse (bytes of variable lenght).
+
+        """
+        if isinstance(apdus, str):
+            apdus = bytes.fromhex(apdus)
+
+        return self.com.exchange(apdus) if apdus else None
 
     def close(self) -> None:
         """Close `self.com` interface.
