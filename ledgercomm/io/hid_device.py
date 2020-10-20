@@ -120,10 +120,10 @@ class HID(Comm):
             read_bytes = bytes(self.device.read(64 + 1, timeout_ms=1000))
             data += read_bytes[5:]
 
-        logging.debug("<= %s", data[:data_len].hex())
-
         sw: int = int.from_bytes(data[data_len - 2:data_len], byteorder="big")
         data = data[:data_len - 2]
+
+        logging.debug("<= %s %s", data.hex(), hex(sw)[2:])
 
         return sw, data
 
