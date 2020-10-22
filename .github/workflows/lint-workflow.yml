@@ -1,0 +1,38 @@
+name: Code check
+
+on: [push, pull_request]
+
+jobs:
+  job_lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/checkout@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install pip setuptools --upgrade
+          if [ -f requirements-dev.txt ]; then python3 -m pip install -r requirements-dev.txt; fi
+
+      - name: Pycodestyle (PEP 8)
+        run: |
+          python3 -m pycodestyle ledgercomm/
+
+      - name: Pydocstyle (PEP 257)
+        run: |
+          python3 -m pydocstyle ledgercomm/
+
+      - name: Pylint
+        run: |
+          python3 -m pylint --disable=W0511 --rcfile=setup.cfg ledgercomm/ > pylint.log
+          grep -c "Your code has been rated at 10.00/10" pylint.log
+
+      - name: MyPy
+        run: |
+          python3 -m mypy ledgercomm/
