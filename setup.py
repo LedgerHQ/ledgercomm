@@ -20,10 +20,12 @@ version = re.search(
 setup(
     name=name,
     version=version["number"],
+    url="https://github.com/LedgerHQ/ledgercomm",
+    python_requires=">=3.7.0",
     description="Library to communicate with Nano S/X and Speculos",
     long_description=Path("README.md").read_text(),
+    long_description_content_type="text/markdown",
     packages=find_packages(),
-    install_requires=[],
     extras_require={
         "hid": ["hidapi>=0.9.0.post3"],
         "repl": ["ipython>=7.17.0"]
@@ -34,5 +36,13 @@ setup(
             "ledgercomm-parser = ledgercomm.cli.parser:main"
         ],
     },
-    zip_safe=True
+    zip_safe=True,
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Environment :: Console",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Operating System :: POSIX"
+    ]
 )
