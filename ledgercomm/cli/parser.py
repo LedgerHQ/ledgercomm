@@ -1,4 +1,4 @@
-"""ledgercomm.cli.parse module."""
+"""ledgercomm.cli.parser module."""
 
 import argparse
 from pathlib import Path
