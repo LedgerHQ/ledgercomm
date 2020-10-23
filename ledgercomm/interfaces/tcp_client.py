@@ -1,10 +1,10 @@
-"""ledgercomm.io.tcp_client module."""
+"""ledgercomm.interfaces.tcp_client module."""
 
 import logging
 import socket
 from typing import Tuple
 
-from ledgercomm.io.comm import Comm
+from ledgercomm.interfaces.comm import Comm
 
 
 class TCPClient(Comm):

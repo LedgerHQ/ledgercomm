@@ -5,8 +5,8 @@ import logging
 import struct
 from typing import Union, Tuple, Optional, Literal, cast
 
-from ledgercomm.io.tcp_client import TCPClient
-from ledgercomm.io.hid_device import HID
+from ledgercomm.interfaces.tcp_client import TCPClient
+from ledgercomm.interfaces.hid_device import HID
 
 
 class Transport:

@@ -1,4 +1,4 @@
-"""ledgercomm.io.hid_device module."""
+"""ledgercomm.interfaces.hid_device module."""
 
 import logging
 from typing import List, Tuple, Optional
@@ -8,7 +8,7 @@ try:
 except ImportError:
     hid = None
 
-from ledgercomm.io.comm import Comm
+from ledgercomm.interfaces.comm import Comm
 
 
 class HID(Comm):
