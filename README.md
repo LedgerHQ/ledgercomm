@@ -27,9 +27,9 @@ $ pip install ledgercomm[hid]
 from ledgercomm import Transport
 
 # Nano S/X using HID interface
-transport = Transport(hid=True, debug=True)
+transport = Transport(interface="hid", debug=True)
 # or Speculos through TCP socket
-transport = Transport(server="127.0.0.1", port=9999, debug=True)
+transport = Transport(interface="tcp", server="127.0.0.1", port=9999, debug=True)
 
 #
 # send/recv APDUs
