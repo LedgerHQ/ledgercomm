@@ -44,5 +44,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Operating System :: POSIX"
-    ]
+    ],
+    author="grydz",
+    author_email="hello@ledger.fr"
 )
