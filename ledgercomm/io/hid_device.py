@@ -1,7 +1,7 @@
 """ledgercomm.io.hid_device module."""
 
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 try:
     import hid
@@ -11,39 +11,60 @@ except ImportError:
 from ledgercomm.io.comm import Comm
 
 
-LEDGER_VENDOR_ID: int = 0x2C97
-
-
 class HID(Comm):
     """HID class.
 
     Mainly used to communicate with Nano S/X through USB.
 
+    Parameters
+    ----------
+    vendor_id: int
+        Vendor ID of the device. Default to Ledger Vendor ID 0x2C97.
+
     Attributes
     ----------
     device : hid.device
         HID device connection.
-    path : bytes
+    path : Optional[bytes]
         Path of the HID device.
     __opened : bool
         Whether the connection to the HID device is opened or not.
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self, vendor_id: int = 0x2C97) -> None:
         """Init constructor of HID."""
         if hid is None:
-            raise ImportError("hidapi is not installed!")
+            raise ImportError("hidapi is not installed, try: "
+                              "'pip install ledgercomm[hid]'")
 
         self.device = hid.device()
-        self.path = HID.enumerate_devices()[0]
-        self.device.open_path(self.path)
-        self.device.set_nonblocking(True)
-        self.__opened: bool = True
+        self.path: Optional[bytes] = None
+        self.__opened: bool = False
+        self.vendor_id: int = vendor_id
+
+    def open(self) -> None:
+        """Open connection to the HID device.
+
+        Returns
+        -------
+        None
+
+        """
+        if not self.__opened:
+            self.path = HID.enumerate_devices(self.vendor_id)[0]
+            self.device.open_path(self.path)
+            self.device.set_nonblocking(True)
+            self.__opened = True
 
     @staticmethod
-    def enumerate_devices() -> List[bytes]:
+    def enumerate_devices(vendor_id: int = 0x2C97) -> List[bytes]:
         """Enumerate HID devices to find Nano S/X.
+
+        Parameters
+        ----------
+        vendor_id: int
+            Vendor ID of the device. Default to Ledger Vendor ID 0x2C97.
 
         Returns
         -------
@@ -53,12 +74,12 @@ class HID(Comm):
         """
         devices: List[bytes] = []
 
-        for hid_device in hid.enumerate(LEDGER_VENDOR_ID, 0):
+        for hid_device in hid.enumerate(vendor_id, 0):
             if (hid_device.get("interface_number") == 0 or
                     hid_device.get("usage_page") == 0xffa0):
                 devices.append(hid_device["path"])
 
-        assert len(devices) != 0, f"Can't find device with vendor_id {LEDGER_VENDOR_ID}"
+        assert len(devices) != 0, f"Can't find device with vendor_id {vendor_id}"
 
         return devices
 

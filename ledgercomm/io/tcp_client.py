@@ -28,7 +28,7 @@ class TCPClient(Comm):
     socket : socket.socket
         TCP socket to communicate with the server.
     __opened : bool
-        Whether the socket is opened or not.
+        Whether the TCP socket is opened or not.
 
     """
 
@@ -37,8 +37,19 @@ class TCPClient(Comm):
         self.server: str = server
         self.port: int = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.server, self.port))
-        self.__opened: bool = True
+        self.__opened: bool = False
+
+    def open(self) -> None:
+        """Open connection to TCP socket with `self.server` and `self.port`.
+
+        Returns
+        -------
+        None
+
+        """
+        if not self.__opened:
+            self.socket.connect((self.server, self.port))
+            self.__opened = True
 
     def send(self, data: bytes) -> int:
         """Send `data` through TCP socket `self.socket`.

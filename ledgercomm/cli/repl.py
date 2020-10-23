@@ -10,6 +10,10 @@ from ledgercomm import Transport
 
 def main():
     """Entrypoint of ledgercomm-repl binary."""
+    if IPython is None:
+        raise ImportError("IPython is not installed, try: "
+                          "'pip install ledgercomm[all]'")
+
     scope_vars = {"Transport": Transport}
     print("Welcome to ledgercomm REPL!")
     IPython.start_ipython(argv=[], user_ns=scope_vars)

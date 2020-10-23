@@ -28,7 +28,7 @@ setup(
     packages=find_packages(),
     extras_require={
         "hid": ["hidapi>=0.9.0.post3"],
-        "repl": ["ipython>=7.17.0"]
+        "all":  ["hidapi>=0.9.0.post3", "ipython>=7.17.0"]
     },
     entry_points={
         "console_scripts": [

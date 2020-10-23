@@ -72,8 +72,11 @@ def main():
 
     args = parser.parse_args()
 
-    transport = (Transport(hid=True, debug=True) if args.hid
-                 else Transport(server=args.server, port=args.port, debug=True))
+    transport = (Transport(interface="hid", debug=True) if args.hid
+                 else Transport(interface="tcp",
+                                server=args.server,
+                                port=args.port,
+                                debug=True))
 
     if args.command == "file":
         filepath: Path = Path(args.filepath)
