@@ -7,11 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        # Add 3.9 when pylint will be compatible!
+        python-version: [3.8]
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/checkout@v2
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -30,8 +33,7 @@ jobs:
 
       - name: Pylint
         run: |
-          python3 -m pylint --disable=W0511 --rcfile=setup.cfg ledgercomm/ > pylint.log
-          grep -c "Your code has been rated at 10.00/10" pylint.log
+          python3 -m pylint --disable=W0511 --rcfile=setup.cfg ledgercomm/ # disable TODO (fixme): W0511
 
       - name: MyPy
         run: |
