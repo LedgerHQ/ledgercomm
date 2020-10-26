@@ -1,7 +1,9 @@
 name: Deploy on PyPi
 
 on:
-  create:
+  push:
+    branches-ignore:
+      - '*'
     tags:
       - '*'
 
@@ -10,11 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Branch info
+      - name: Tag info
         id: branch_info
         run: |
-          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
 
       - uses: actions/checkout@v2
@@ -26,16 +26,12 @@ jobs:
 
       - name: Check version
         run: |
-          echo $SOURCE_NAME
-          echo $SOURCE_BRANCH
-          echo $SOURCE_TAG
+          echo "Tag: ${SOURCE_TAG}"
           VERSION=$(python3 setup.py --version)
-          echo $VERSION
-          if [ VERSION == $SOURCE_TAG ]; then exit 0 else exit 1; fi
+          echo "Version: ${VERSION}"
+          if [ $VERSION == $SOURCE_TAG ]; then exit 0; else exit 1; fi
 
         env:
-          SOURCE_NAME: ${{ steps.branch_info.outputs.SOURCE_NAME }}
-          SOURCE_BRANCH: ${{ steps.branch_info.outputs.SOURCE_BRANCH }}
           SOURCE_TAG: ${{ steps.branch_info.outputs.SOURCE_TAG }}
 
       - name: Install dependencies
