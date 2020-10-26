@@ -22,7 +22,7 @@ setup(
     version=version["number"],
     url="https://github.com/LedgerHQ/ledgercomm",
     python_requires=">=3.8.0",
-    description="Library to communicate with Nano S/X and Speculos",
+    description="Library to communicate with Ledger Nano S/X and Speculos",
     long_description=Path("README.md").read_text(),
     long_description_content_type="text/markdown",
     packages=find_packages(),
@@ -33,7 +33,7 @@ setup(
     entry_points={
         "console_scripts": [
             "ledgercomm-repl = ledgercomm.cli.repl:main",
-            "ledgercomm-parser = ledgercomm.cli.parser:main"
+            "ledgercomm-send = ledgercomm.cli.send:main"
         ],
     },
     zip_safe=True,

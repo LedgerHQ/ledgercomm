@@ -1,4 +1,4 @@
-"""ledgercomm.cli.parser module."""
+"""ledgercomm.cli.send module."""
 
 import argparse
 from pathlib import Path
@@ -28,7 +28,7 @@ def main():
     # file subparser
     parser_file = subparsers.add_parser(
         "file",
-        help="to read APDUs from file"
+        help="send APDUs from file"
     )
     parser_file.add_argument(
         "filepath",
@@ -37,12 +37,12 @@ def main():
     # stdin subparser
     _ = subparsers.add_parser(
         "stdin",
-        help="to read APDUs from stdin"
+        help="send APDUs from stdin"
     )
     # stdin subparser
     parser_log = subparsers.add_parser(
         "log",
-        help="to read APDUs from Ledger Live logs"
+        help="send APDUs from Ledger Live log file"
     )
     parser_log.add_argument(
         "filepath",
@@ -65,8 +65,8 @@ def main():
         default=9999
     )
     parser.add_argument(
-        "--condition",
-        help="Only send APDUs starting with 'condition' (default: None)",
+        "--startswith",
+        help="Only send APDUs which starts with STARTSWITH (default: None)",
         default=None
     )
 

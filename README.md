@@ -62,26 +62,26 @@ sw, response = transport.exchange_raw(b"\xe0\x03\x00\x00\x00")
 
 #### Usage
 
-When installed, `ledgercomm` provides a CLI tools named `ledgercomm-parser`
+When installed, `ledgercomm` provides a CLI tool named `ledgercomm-send`
 
 ```bash
-$ ledgercomm-parser --help
-usage: ledgercomm-parser [-h] [--hid] [--server SERVER] [--port PORT] [--condition CONDITION]
-                         {file,stdin,log} ...
+$ ledgercomm-send --help
+usage: ledgercomm-send [-h] [--hid] [--server SERVER] [--port PORT] [--startswith STARTSWITH]
+                       {file,stdin,log} ...
 
 positional arguments:
   {file,stdin,log}      sub-command help
-    file                to read APDUs from file
-    stdin               to read APDUs from stdin
-    log                 to read APDUs from Ledger Live logs
+    file                send APDUs from file
+    stdin               send APDUs from stdin
+    log                 send APDUs from Ledger Live log file
 
 optional arguments:
   -h, --help            show this help message and exit
   --hid                 Use HID instead of TCP client
   --server SERVER       IP server of the TCP client (default: 127.0.0.1)
   --port PORT           Port of the TCP client (default: 9999)
-  --condition CONDITION
-                        Only send APDUs starting with 'condition' (default: None)
+  --startswith STARTSWITH
+                        Only send APDUs starting with 'STARTSWITH' (default: None)
 ```
 
 #### Example
@@ -89,8 +89,8 @@ optional arguments:
 If Speculos is launched with default parameters or your Nano S/X is plugged with correct udev rules, you can send APDUs from stdin
 
 ```bash
-$ echo "E003000000" | ledgercomm-parser stdin  # Speculos
-$ echo "E003000000" | ledgercomm-parser --hid stdin  # Nano S/X
+$ echo "E003000000" | ledgercomm-send stdin  # Speculos
+$ echo "E003000000" | ledgercomm-send --hid stdin  # Nano S/X
 ```
 
 Or you can replay APDUs using the following text file named `apdus.txt` with some condition
@@ -105,5 +105,5 @@ Or you can replay APDUs using the following text file named `apdus.txt` with som
 then
 
 ```bash
-$ ledgercomm-parser --condition "=>" file apdus.txt
+$ ledgercomm-send --startswith "=>" file apdus.txt
 ```
