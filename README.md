@@ -3,7 +3,7 @@
 ## Overview
 
 Python library to send and receive [APDU](https://en.wikipedia.org/wiki/Smart_card_application_protocol_data_unit) through HID or TCP socket.
-It could be used with a Ledger Nano S/X or with the [Speculos](https://github.com/LedgerHQ/speculos) emulator.
+It can be used with a Ledger Nano S/X or with the [Speculos](https://github.com/LedgerHQ/speculos) emulator.
 
 ## Install
 
@@ -81,7 +81,7 @@ optional arguments:
   --server SERVER       IP server of the TCP client (default: 127.0.0.1)
   --port PORT           Port of the TCP client (default: 9999)
   --startswith STARTSWITH
-                        Only send APDUs starting with 'STARTSWITH' (default: None)
+                        Only send APDUs starting with STARTSWITH (default: None)
 ```
 
 #### Example
@@ -96,7 +96,7 @@ $ echo "E003000000" | ledgercomm-send --hid stdin  # Nano S/X
 Or you can replay APDUs using the following text file named `apdus.txt` with some condition
 
 ```text
-# this line won't be send if you've the right 'condition'
+# this line won't be send if you've the right STARTSWITH condition
 => E003000000
 # another APDU to send
 => E004000000
