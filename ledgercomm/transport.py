@@ -9,6 +9,12 @@ from ledgercomm.interfaces.tcp_client import TCPClient
 from ledgercomm.interfaces.hid_device import HID
 
 
+class TransportType(enum.Enum):
+    """Type of interface available."""
+    HID = 1
+    TCP = 2
+
+
 class Transport:
     """Transport class to send APDUs.
 
@@ -28,6 +34,8 @@ class Transport:
 
     Attributes
     ----------
+    interface : TransportType
+        Either TransportType.HID or TransportType.TCP.
     com : Union[TCPClient, HID]
         Communication interface to send/receive APDUs.
 
@@ -42,14 +50,16 @@ class Transport:
         if debug:
             logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-        self.com: Union[TCPClient, HID]
+        self.inferface: TransportType
 
-        if interface == "hid":
-            self.com = HID()
-        elif interface == "tcp":
-            self.com = TCPClient(server=server, port=port)
-        else:
+        try:
+            self.interface = TransportType[interface.upper()]
+        except KeyError:
             raise Exception(f"Unknown interface '{interface}'!")
+
+        self.com: Union[TCPClient, HID] = (TCPClient(server=server, port=port)
+                                           if self.interface == TransportType.TCP
+                                           else HID())
 
         self.com.open()
 
