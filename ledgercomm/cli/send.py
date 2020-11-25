@@ -81,15 +81,15 @@ def main():
     if args.command == "file":
         filepath: Path = Path(args.filepath)
 
-        for apdu in parse_file(filepath, args.condition):  # type: str
+        for apdu in parse_file(filepath, args.startswith):  # type: str
             if apdu:
                 transport.exchange_raw(re.sub(r"[^a-fA-F0-9]", "", apdu))
 
     if args.command == "stdin":
         apdu: str = input()
 
-        if args.condition:
-            apdu = apdu.replace(args.condition, "").strip()
+        if args.startswith:
+            apdu = apdu.replace(args.startswith, "").strip()
 
         if apdu:
             transport.exchange_raw(re.sub(r"[^a-fA-F0-9]", "", apdu))
