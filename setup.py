@@ -27,12 +27,10 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     extras_require={
-        "hid": ["hidapi>=0.9.0.post3"],
-        "all": ["hidapi>=0.9.0.post3", "ipython>=7.17.0"]
+        "hid": ["hidapi>=0.9.0.post3"]
     },
     entry_points={
         "console_scripts": [
-            "ledgercomm-repl = ledgercomm.cli.repl:main",
             "ledgercomm-send = ledgercomm.cli.send:main"
         ],
     },
