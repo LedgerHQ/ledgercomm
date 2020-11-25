@@ -81,16 +81,16 @@ class TCPClient(Comm):
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, data) containing the status word and associated datas.
+            A pair (sw, rdata) containing the status word and response data.
 
         """
         length: int = int.from_bytes(self.socket.recv(4), byteorder="big")
-        data: bytes = self.socket.recv(length)
+        rdata: bytes = self.socket.recv(length)
         sw: int = int.from_bytes(self.socket.recv(2), byteorder="big")
 
-        logging.debug("<= %s %s", data.hex(), hex(sw)[2:])
+        logging.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
 
-        return sw, data
+        return sw, rdata
 
     def exchange(self, data: bytes) -> Tuple[int, bytes]:
         """Exchange (send + receive) with `self.socket`.
@@ -103,7 +103,7 @@ class TCPClient(Comm):
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, data) containing the status word and associated datas.
+            A pair (sw, rdata) containing the status word and response data.
 
         """
         self.send(data)

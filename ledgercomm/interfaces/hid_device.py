@@ -127,7 +127,7 @@ class HID(Comm):
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, data) containing the status word and associated datas.
+            A pair (sw, rdata) containing the status word and response data.
 
         """
         seq_idx: int = 0
@@ -147,11 +147,11 @@ class HID(Comm):
             data += read_bytes[5:]
 
         sw: int = int.from_bytes(data[data_len - 2:data_len], byteorder="big")
-        data = data[:data_len - 2]
+        rdata: bytes = data[:data_len - 2]
 
-        logging.debug("<= %s %s", data.hex(), hex(sw)[2:])
+        logging.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
 
-        return sw, data
+        return sw, rdata
 
     def exchange(self, data: bytes) -> Tuple[int, bytes]:
         """Exchange (send + receive) with `self.device`.
@@ -164,7 +164,7 @@ class HID(Comm):
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, data) containing the status word and associated datas.
+            A pair (sw, rdata) containing the status word and reponse data.
 
         """
         self.send(data)

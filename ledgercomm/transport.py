@@ -107,7 +107,7 @@ class Transport:
              p1: int = 0,
              p2: int = 0,
              option: Optional[int] = None,
-             payload: bytes = b"") -> int:
+             cdata: bytes = b"") -> int:
         """Send structured APDUs through `self.com`.
 
         Parameters
@@ -122,8 +122,8 @@ class Transport:
             Instruction parameter: P2 (1 byte).
         option : Optional[int]
             Optional parameter: Opt (1 byte).
-        payload : bytes
-            Payload to send (bytes of variable length).
+        cdata : bytes
+            Command data (variable length).
 
         Returns
         -------
@@ -131,9 +131,9 @@ class Transport:
             Total lenght of the APDU sent.
 
         """
-        header: bytes = Transport.apdu_header(cla, ins, p1, p2, option, len(payload))
+        header: bytes = Transport.apdu_header(cla, ins, p1, p2, option, len(cdata))
 
-        return self.com.send(header + payload)
+        return self.com.send(header + cdata)
 
     def send_raw(self, apdu: Union[str, bytes]) -> int:
         """Send raw bytes `apdu` through `self.com`.
@@ -162,8 +162,8 @@ class Transport:
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, response) for the status word (2 bytes represented
-            as int) and the reponse (bytes of variable lenght).
+            A pair (sw, rdata) for the status word (2 bytes represented
+            as int) and the reponse data (variable lenght).
 
         """
         return self.com.recv()
@@ -174,7 +174,7 @@ class Transport:
                  p1: int = 0,
                  p2: int = 0,
                  option: Optional[int] = None,
-                 payload: bytes = b"") -> Tuple[int, bytes]:
+                 cdata: bytes = b"") -> Tuple[int, bytes]:
         """Send structured APDUs and wait to receive datas from `self.com`.
 
         Parameters
@@ -189,19 +189,19 @@ class Transport:
             Instruction parameter: P2 (1 byte).
         option : Optional[int]
             Optional parameter: Opt (1 byte).
-        payload : bytes
-            Payload to send (bytes of variable length).
+        cdata : bytes
+            Command data (variable length).
 
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, response) for the status word (2 bytes represented
-            as int) and the reponse (bytes of variable lenght).
+            A pair (sw, rdata) for the status word (2 bytes represented
+            as int) and the reponse data (bytes of variable lenght).
 
         """
-        header: bytes = Transport.apdu_header(cla, ins, p1, p2, option, len(payload))
+        header: bytes = Transport.apdu_header(cla, ins, p1, p2, option, len(cdata))
 
-        return self.com.exchange(header + payload)
+        return self.com.exchange(header + cdata)
 
     def exchange_raw(self, apdu: Union[str, bytes]) -> Tuple[int, bytes]:
         """Send raw bytes `apdu` and wait to receive datas from `self.com`.
@@ -214,7 +214,7 @@ class Transport:
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, response) for the status word (2 bytes represented
+            A pair (sw, rdata) for the status word (2 bytes represented
             as int) and the reponse (bytes of variable lenght).
 
         """
