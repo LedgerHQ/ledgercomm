@@ -12,6 +12,7 @@ from ledgercomm.log import LOG
 
 class TransportType(enum.Enum):
     """Type of interface available."""
+
     HID = 1
     TCP = 2
 
@@ -55,8 +56,8 @@ class Transport:
 
         try:
             self.interface = TransportType[interface.upper()]
-        except KeyError:
-            raise Exception(f"Unknown interface '{interface}'!")
+        except KeyError as exc:
+            raise Exception(f"Unknown interface '{interface}'!") from exc
 
         self.com: Union[TCPClient, HID] = (TCPClient(server=server, port=port)
                                            if self.interface == TransportType.TCP

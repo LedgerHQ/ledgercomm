@@ -80,7 +80,8 @@ class HID(Comm):
                     hid_device.get("usage_page") == 0xffa0):
                 devices.append(hid_device["path"])
 
-        assert len(devices) != 0, f"Can't find Ledger device with vendor_id {hex(vendor_id)}"
+        assert len(devices) != 0, (
+            f"Can't find Ledger device with vendor_id {hex(vendor_id)}")
 
         return devices
 
