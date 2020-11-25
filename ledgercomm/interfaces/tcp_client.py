@@ -57,7 +57,7 @@ class TCPClient(Comm):
         Parameters
         ----------
         data : bytes
-            Bytes with `data` to send.
+            Bytes of data to send.
 
         Returns
         -------

@@ -76,10 +76,11 @@ class HID(Comm):
 
         for hid_device in hid.enumerate(vendor_id, 0):
             if (hid_device.get("interface_number") == 0 or
+                    # MacOS specific
                     hid_device.get("usage_page") == 0xffa0):
                 devices.append(hid_device["path"])
 
-        assert len(devices) != 0, f"Can't find device with vendor_id {vendor_id}"
+        assert len(devices) != 0, f"Can't find Ledger device with vendor_id {hex(vendor_id)}"
 
         return devices
 
@@ -89,7 +90,7 @@ class HID(Comm):
         Parameters
         ----------
         data : bytes
-            Bytes with `data` to send.
+            Bytes of data to send.
 
         Returns
         -------
@@ -106,7 +107,7 @@ class HID(Comm):
         length: int = 0
 
         while offset < len(data):
-            # Header: channel (0x101), tag (0x05), sequence index
+            # Header: channel (0x0101), tag (0x05), sequence index
             header: bytes = b"\x01\x01\x05" + seq_idx.to_bytes(2, byteorder="big")
             data_chunk: bytes = (header +
                                  data[offset:offset + 64 - len(header)])
