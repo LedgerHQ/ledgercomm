@@ -7,6 +7,7 @@ from typing import Union, Tuple, Optional, Literal, cast
 
 from ledgercomm.interfaces.tcp_client import TCPClient
 from ledgercomm.interfaces.hid_device import HID
+from ledgercomm.log import LOG
 
 
 class TransportType(enum.Enum):
@@ -48,7 +49,7 @@ class Transport:
                  debug: bool = False) -> None:
         """Init constructor of Transport."""
         if debug:
-            logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+            LOG.setLevel(logging.DEBUG)
 
         self.inferface: TransportType
 

@@ -1,10 +1,10 @@
 """ledgercomm.interfaces.tcp_client module."""
 
-import logging
 import socket
 from typing import Tuple
 
 from ledgercomm.interfaces.comm import Comm
+from ledgercomm.log import LOG
 
 
 class TCPClient(Comm):
@@ -68,7 +68,7 @@ class TCPClient(Comm):
         if not data:
             raise Exception("Can't send empty data!")
 
-        logging.debug("=> %s", data.hex())
+        LOG.debug("=> %s", data.hex())
         data_len: bytes = int.to_bytes(len(data), 4, byteorder="big")
 
         return self.socket.send(data_len + data)
@@ -88,7 +88,7 @@ class TCPClient(Comm):
         rdata: bytes = self.socket.recv(length)
         sw: int = int.from_bytes(self.socket.recv(2), byteorder="big")
 
-        logging.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
+        LOG.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
 
         return sw, rdata
 

@@ -1,6 +1,5 @@
 """ledgercomm.interfaces.hid_device module."""
 
-import logging
 from typing import List, Tuple, Optional
 
 try:
@@ -9,6 +8,7 @@ except ImportError:
     hid = None
 
 from ledgercomm.interfaces.comm import Comm
+from ledgercomm.log import LOG
 
 
 class HID(Comm):
@@ -101,6 +101,8 @@ class HID(Comm):
         if not data:
             raise Exception("Can't send empty data!")
 
+        LOG.debug("=> %s", data.hex())
+
         data = int.to_bytes(len(data), 2, byteorder="big") + data
         offset: int = 0
         seq_idx: int = 0
@@ -114,7 +116,6 @@ class HID(Comm):
 
             self.device.write(b"\x00" + data_chunk)
             length += len(data_chunk) + 1
-            logging.debug("=> %s", data_chunk.hex())
             offset += 64 - len(header)
             seq_idx += 1
 
@@ -150,7 +151,7 @@ class HID(Comm):
         sw: int = int.from_bytes(data[data_len - 2:data_len], byteorder="big")
         rdata: bytes = data[:data_len - 2]
 
-        logging.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
+        LOG.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
 
         return sw, rdata
 
