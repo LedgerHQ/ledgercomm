@@ -52,7 +52,7 @@ class Transport:
         if debug:
             LOG.setLevel(logging.DEBUG)
 
-        self.inferface: TransportType
+        self.interface: TransportType
 
         try:
             self.interface = TransportType[interface.upper()]
