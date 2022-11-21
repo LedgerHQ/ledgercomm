@@ -10,7 +10,7 @@ from ledgercomm import Transport
 
 def parse_file(filepath: Path, condition: Optional[str]) -> Iterator[str]:
     """Filter with `condition` and yield line of `filepath`."""
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         for line in f:
             if condition and line.startswith(condition):
                 yield line.replace(condition, "").strip()
