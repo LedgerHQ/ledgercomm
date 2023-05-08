@@ -1,6 +1,6 @@
 """ledgercomm.interfaces.hid_device module."""
 
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 try:
     import hid
@@ -76,6 +76,8 @@ class HID(Comm):
         devices: List[bytes] = []
 
         for hid_device in hid.enumerate(vendor_id, 0):
+            print("hid_device", hid_device)
+
             if (hid_device.get("interface_number") == 0 or
                     # MacOS specific
                     hid_device.get("usage_page") == 0xffa0):
