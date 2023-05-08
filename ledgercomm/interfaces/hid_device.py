@@ -118,6 +118,7 @@ class HID(Comm):
             data_chunk: bytes = (header +
                                  data[offset:offset + 64 - len(header)])
 
+            print("HID.send(), device.write()", len(data_chunk))
             self.device.write(b"\x00" + data_chunk)
             length += len(data_chunk) + 1
             offset += 64 - len(header)
@@ -137,8 +138,12 @@ class HID(Comm):
 
         """
         seq_idx: int = 0
+
+        print("HID.recv(), set_nonblocking(False)")
         self.device.set_nonblocking(False)
+        print("HID.recv(), device.read()")
         data_chunk: bytes = bytes(self.device.read(64 + 1))
+        print("HID.recv(), set_nonblocking(True)")
         self.device.set_nonblocking(True)
 
         assert data_chunk[:2] == b"\x01\x01"
@@ -149,6 +154,7 @@ class HID(Comm):
         data: bytes = data_chunk[7:]
 
         while len(data) < data_len:
+            print("HID.recv(), device.read() (in loop)")
             read_bytes = bytes(self.device.read(64 + 1, timeout_ms=1000))
             data += read_bytes[5:]
 
