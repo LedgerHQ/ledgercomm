@@ -145,9 +145,7 @@ class HID(Comm):
         seq_idx: int = 0
 
         print("HID.recv(), set_nonblocking(False)")
-        time.sleep(0.1)
         self.device.set_nonblocking(False)
-        time.sleep(0.1)
         print("HID.recv(), device.read()")
         data_chunk: bytes = bytes(self.device.read(64 + 1))
         print("HID.recv(), set_nonblocking(True)")
