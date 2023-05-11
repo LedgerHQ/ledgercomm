@@ -83,7 +83,7 @@ class HID(Comm):
             # if (hid_device.get("interface_number") == 0 or
             #         # MacOS specific
             #         hid_device.get("usage_page") == 0xffa0):
-            if hid_device.get("interface_number") == 0:
+            if hid_device.get("interface_number") == 0 and hid_device.get("usage_page") == 0xffa0:
                 devices.append(hid_device["path"])
 
         assert len(devices) != 0, (
