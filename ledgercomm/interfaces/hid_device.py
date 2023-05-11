@@ -80,13 +80,16 @@ class HID(Comm):
         for hid_device in hid.enumerate(vendor_id, 0):
             print("hid_device", hid_device)
 
-            if (hid_device.get("interface_number") == 0 or
-                    # MacOS specific
-                    hid_device.get("usage_page") == 0xffa0):
+            # if (hid_device.get("interface_number") == 0 or
+            #         # MacOS specific
+            #         hid_device.get("usage_page") == 0xffa0):
+            if hid_device.get("interface_number") == 0:
                 devices.append(hid_device["path"])
 
         assert len(devices) != 0, (
             f"Can't find Ledger device with vendor_id {hex(vendor_id)}")
+
+        print("HID.enumerate_devices()", devices)
 
         return devices
 
