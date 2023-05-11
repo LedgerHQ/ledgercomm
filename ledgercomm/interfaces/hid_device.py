@@ -55,6 +55,7 @@ class HID(Comm):
         if not self.__opened:
             if not self.path:
                 self.path = HID.enumerate_devices(self.vendor_id)[0]
+            print("HID.open(), device.open_path()", self.path)
             self.device.open_path(self.path)
             self.device.set_nonblocking(True)
             self.__opened = True
