@@ -88,7 +88,8 @@ class HID(Comm):
 
         if len(devices) > 1:
             LOG.warn(
-                "More than one Ledger device with vendor_id %s, will pick the first one", hex(vendor_id))
+                "More than one Ledger device with vendor_id %s, will pick the first one",
+                hex(vendor_id))
 
             # First, we sort by "path", so that the order is deterministic
             devices = sorted(devices, key=lambda device: device["path"])
