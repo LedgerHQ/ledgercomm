@@ -15,7 +15,10 @@ MACOS_USAGE_PAGE = 0xffa0
 
 
 class HIDAPINotInstalledError(ImportError):
+    """Custom error to be raised when hidapi is not installed."""
+
     def __init__(self):
+        """Init constructor of HIDAPINotInstalledError."""
         super().__init__("hidapi is not installed, try: 'pip install ledgercomm[hid]'")
 
 
@@ -40,7 +43,7 @@ class HID(Comm):
 
     """
 
-    def __init__(self, vendor_id: int = 0x2C97) -> None:
+    def __init__(self, vendor_id: int = DEFAULT_VENDOR_ID) -> None:
         """Init constructor of HID."""
         if hid is None:
             raise HIDAPINotInstalledError()
