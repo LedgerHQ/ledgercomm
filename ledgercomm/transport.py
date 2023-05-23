@@ -69,7 +69,7 @@ class Transport:
         try:
             self.interface = TransportType[interface.upper()]
         except KeyError as exc:
-            raise Exception(f"Unknown interface '{interface}'!") from exc
+            raise KeyError(f"Unknown interface '{interface}'!") from exc
 
         self.com: Union[TCPClient, HID] = (TCPClient(server=server, port=port)
                                            if self.interface == TransportType.TCP

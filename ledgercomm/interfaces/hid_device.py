@@ -101,7 +101,7 @@ class HID(Comm):
 
         """
         if not data:
-            raise Exception("Can't send empty data!")
+            raise ValueError("Can't send empty data!")
 
         LOG.debug("=> %s", data.hex())
 
