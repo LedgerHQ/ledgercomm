@@ -1,0 +1,77 @@
+name: Python checks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop, master]
+  pull_request:
+    branches: [develop, master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8, 3.9, '3.10']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python3 -m pip install pip setuptools --upgrade
+          if [ -f requirements-dev.txt ]; then python3 -m pip install -r requirements-dev.txt; fi
+      - name: Pycodestyle (PEP 8 - 257)
+        run: |
+          python3 -m pycodestyle ledgercomm/
+      - name: Pylint
+        run: |
+          python3 -m pylint --disable=W0511 --rcfile=setup.cfg ledgercomm/ # disable TODO (fixme): W0511
+
+  yapf:
+    name: Python formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install yapf
+      - name: Yapf source formatting
+        run: yapf ledgercomm --recursive -d
+
+  mypy:
+    name: Python type checking
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install mypy types-setuptools types-requests
+      - name: Mypy type checking
+        run: mypy ledgercomm
+
+  bandit:
+    name: Security checking
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install bandit
+      - name: Bandit security checking
+        run: bandit -r ledgercomm -ll
