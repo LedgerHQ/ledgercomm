@@ -72,8 +72,7 @@ class Transport:
             raise KeyError(f"Unknown interface '{interface}'!") from exc
 
         self.com: Union[TCPClient, HID] = (TCPClient(server=server, port=port)
-                                           if self.interface == TransportType.TCP
-                                           else HID())
+                                           if self.interface == TransportType.TCP else HID())
 
         self.com.open()
 
@@ -110,20 +109,16 @@ class Transport:
         ins = cast(int, ins.value) if isinstance(ins, enum.IntEnum) else cast(int, ins)
 
         if opt:
-            return struct.pack("BBBBBB",
-                               cla,
-                               ins,
-                               p1,
-                               p2,
-                               1 + lc,  # add option to length
-                               opt)
+            return struct.pack(
+                "BBBBBB",
+                cla,
+                ins,
+                p1,
+                p2,
+                1 + lc,  # add option to length
+                opt)
 
-        return struct.pack("BBBBB",
-                           cla,
-                           ins,
-                           p1,
-                           p2,
-                           lc)
+        return struct.pack("BBBBB", cla, ins, p1, p2, lc)
 
     def send(self,
              cla: int,

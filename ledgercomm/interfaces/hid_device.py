@@ -81,8 +81,7 @@ class HID(Comm):
                     hid_device.get("usage_page") == 0xffa0):
                 devices.append(hid_device["path"])
 
-        assert len(devices) != 0, (
-            f"Can't find Ledger device with vendor_id {hex(vendor_id)}")
+        assert len(devices) != 0, f"Can't find Ledger device with vendor_id {hex(vendor_id)}"
 
         return devices
 
@@ -113,8 +112,7 @@ class HID(Comm):
         while offset < len(data):
             # Header: channel (0x0101), tag (0x05), sequence index
             header: bytes = b"\x01\x01\x05" + seq_idx.to_bytes(2, byteorder="big")
-            data_chunk: bytes = (header +
-                                 data[offset:offset + 64 - len(header)])
+            data_chunk: bytes = header + data[offset:offset + 64 - len(header)]
 
             self.device.write(b"\x00" + data_chunk)
             length += len(data_chunk) + 1
