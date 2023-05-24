@@ -8,41 +8,78 @@ on:
       - '*'
 
 jobs:
-  job_deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Tag info
+      - name: Get tag version
         id: branch_info
         run: |
-          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+          echo "Tag version: ${{ steps.branch_info.outputs.VERSION }}"
 
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-
       - name: Check version
         run: |
-          echo "Tag: ${SOURCE_TAG}"
+          echo "Tag: ${TAG_VERSION}"
           VERSION=$(python3 setup.py --version)
           echo "Version: ${VERSION}"
-          if [ $VERSION == $SOURCE_TAG ]; then exit 0; else exit 1; fi
-
+          if [ $TAG_VERSION == $VERSION ]; \
+          then \
+              exit 0; \
+          else \
+              echo "Tag '${TAG_VERSION}' and package '${VERSION}' versions mismatch!"; \
+              exit 1; \
+          fi
         env:
-          SOURCE_TAG: ${{ steps.branch_info.outputs.SOURCE_TAG }}
+          TAG_VERSION: ${{ steps.branch_info.outputs.VERSION }}
 
       - name: Install dependencies
         run: |
           python -m pip install pip --upgrade
           pip install setuptools wheel twine
 
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Build Python package
         run: |
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+          python -m build
+          twine check dist/*
+
+      - name: Publish Python package on test.pypi.org
+        if: |
+          success() &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/develop' &&
+          contains(github.event.head_commit.message, 'release')
+        run: python -m twine upload --repository testpypi dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PUBLIC_API_TOKEN  }}
+          TWINE_NON_INTERACTIVE: 1
+
+      - name: Publish Python package on pypi.org
+        if: |
+          success() &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master' &&
+          contains(github.event.head_commit.message, 'release')
+        run: python -m twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_PUBLIC_API_TOKEN  }}
+          TWINE_NON_INTERACTIVE: 1
+
+      - name: Publish a release on the repo
+        if: |
+          success() &&
+          github.event_name == 'push' &&
+          contains(fromJSON('["refs/heads/develop", "refs/heads/master"]'), github.ref) &&
+          contains(github.event.head_commit.message, 'release')
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          automatic_release_tag: "v${{ steps.branch_info.outputs.VERSION }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          files: |
+            LICENSE
+            dist/
