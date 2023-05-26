@@ -2,55 +2,65 @@ name: Deploy on PyPi
 
 on:
   push:
-    branches-ignore:
-      - '*'
     tags:
       - '*'
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   deploy:
+    name: Build the Python package and deploy if needed
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get tag version
-        id: branch_info
-        run: |
-          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-          echo "Tag version: ${{ steps.branch_info.outputs.VERSION }}"
-
       - uses: actions/checkout@v3
-
-      - name: Check version
-        run: |
-          echo "Tag: ${TAG_VERSION}"
-          VERSION=$(python3 setup.py --version)
-          echo "Version: ${VERSION}"
-          if [ $TAG_VERSION == $VERSION ]; \
-          then \
-              exit 0; \
-          else \
-              echo "Tag '${TAG_VERSION}' and package '${VERSION}' versions mismatch!"; \
-              exit 1; \
-          fi
-        env:
-          TAG_VERSION: ${{ steps.branch_info.outputs.VERSION }}
+        with:
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
           python -m pip install pip --upgrade
-          pip install setuptools wheel twine
+          pip install build twine
 
       - name: Build Python package
         run: |
           python -m build
           twine check dist/*
+          echo "TAG_VERSION=$(python -c 'from ledgercomm import __version__; print(__version__)')" >> "$GITHUB_ENV"
+
+      - name: Display current status
+        run: |
+          echo "Current status is:"
+          if [[ ${{ github.ref }} == "refs/tags/"* ]]; \
+          then \
+              echo "- Triggered from tag, will be deployed on pypi.org"; \
+          else \
+              echo "- Not triggered from tag, will be deployed on test.pypi.org"; \
+          fi
+          echo "- Tag version: ${{ env.TAG_VERSION }}"
+
+      - name: Check version against CHANGELOG
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          CHANGELOG_VERSION=$(grep -Po '(?<=## \[)(\d\.)+[^\]]' CHANGELOG.md | head -n 1)
+          if [ "${{ env.TAG_VERSION }}" == "${CHANGELOG_VERSION}" ]; \
+          then \
+              exit 0; \
+          else \
+              echo "Tag '${{ env.TAG_VERSION }}' and CHANGELOG '${CHANGELOG_VERSION}' versions mismatch!"; \
+              exit 1; \
+          fi
 
       - name: Publish Python package on test.pypi.org
         if: |
           success() &&
           github.event_name == 'push' &&
-          github.ref == 'refs/heads/develop' &&
-          contains(github.event.head_commit.message, 'release')
+          !startsWith(github.ref, 'refs/tags/')
         run: python -m twine upload --repository testpypi dist/*
         env:
           TWINE_USERNAME: __token__
@@ -61,8 +71,7 @@ jobs:
         if: |
           success() &&
           github.event_name == 'push' &&
-          github.ref == 'refs/heads/master' &&
-          contains(github.event.head_commit.message, 'release')
+          startsWith(github.ref, 'refs/tags/')
         run: python -m twine upload dist/*
         env:
           TWINE_USERNAME: __token__
@@ -73,11 +82,10 @@ jobs:
         if: |
           success() &&
           github.event_name == 'push' &&
-          contains(fromJSON('["refs/heads/develop", "refs/heads/master"]'), github.ref) &&
-          contains(github.event.head_commit.message, 'release')
+          startsWith(github.ref, 'refs/tags/')
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          automatic_release_tag: "v${{ steps.branch_info.outputs.VERSION }}"
+          automatic_release_tag: "v${{ env.TAG_VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: true
           files: |
