@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 from typing import Iterator, Optional
 
-from ledgercomm import Transport
+from ledgercomm import Transport, __version__
 
 
 def parse_file(filepath: Path, condition: Optional[str]) -> Iterator[str]:
@@ -39,8 +39,17 @@ def main():
     parser.add_argument("--startswith",
                         help="Only send APDUs which starts with STARTSWITH (default: None)",
                         default=None)
+    parser.add_argument("--version",
+                        "-v",
+                        help="Print LedgerComm package current version",
+                        default=False,
+                        action="store_true")
 
     args = parser.parse_args()
+
+    if args.version:
+        print(__version__)
+        return 0
 
     transport = (Transport(interface="hid", debug=True) if args.hid else Transport(
         interface="tcp", server=args.server, port=args.port, debug=True))
