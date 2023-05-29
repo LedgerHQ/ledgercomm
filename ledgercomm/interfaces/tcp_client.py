@@ -66,7 +66,7 @@ class TCPClient(Comm):
 
         """
         if not data:
-            raise Exception("Can't send empty data!")
+            raise ValueError("Can't send empty data!")
 
         LOG.debug("=> %s", data.hex())
         data_len: bytes = int.to_bytes(len(data), 4, byteorder="big")
