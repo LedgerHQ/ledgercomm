@@ -83,8 +83,11 @@ class HID(Comm):
 
         # On MacOS, "interface_number" is not a reliable filtering criteria, so we
         # also filter by "usage_page".
-        devices = [device for device in devices if device.get(
-            "usage_page") == MACOS_USAGE_PAGE]
+        mac_filtered_devices = [device for device in devices if device.get(
+             "usage_page") == MACOS_USAGE_PAGE]
+        if len(mac_filtered_devices) != 0:
+            # If we are on a MAC device, we keep the new filtered list
+            devices = mac_filtered_devices
         if len(devices) == 1:
             # No ambiguity, pick the only device
             return devices[0]["path"]
