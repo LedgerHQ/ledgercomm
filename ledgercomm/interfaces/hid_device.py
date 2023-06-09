@@ -22,6 +22,14 @@ class HIDAPINotInstalledError(ImportError):
         super().__init__("hidapi is not installed, try: 'pip install ledgercomm[hid]'")
 
 
+class CannotFindDeviceError(Exception):
+    """Custom error to be raised when the device can't be found."""
+
+    def __init__(self, vendor_id: int):
+        """Init constructor of CannotFindDeviceError."""
+        super().__init__(f"Can't find Ledger device with vendor_id {hex(vendor_id)}")
+
+
 class HID(Comm):
     """HID class.
 
@@ -93,7 +101,7 @@ class HID(Comm):
             return devices[0]["path"]
 
         if len(devices) > 1:
-            LOG.warn(
+            LOG.warning(
                 "More than one Ledger device with vendor_id %s, will pick the first one",
                 hex(vendor_id))
 
@@ -101,7 +109,7 @@ class HID(Comm):
             devices = sorted(devices, key=lambda device: device["path"])
             return devices[0]["path"]
 
-        raise Exception(f"Can't find Ledger device with vendor_id {hex(vendor_id)}")
+        raise CannotFindDeviceError(vendor_id)
 
     @staticmethod
     def enumerate_devices(vendor_id: int = DEFAULT_VENDOR_ID) -> List[bytes]:
