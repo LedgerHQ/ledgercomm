@@ -91,8 +91,9 @@ class HID(Comm):
 
         # On MacOS, "interface_number" is not a reliable filtering criteria, so we
         # also filter by "usage_page".
-        mac_filtered_devices = [device for device in devices if device.get(
-             "usage_page") == MACOS_USAGE_PAGE]
+        mac_filtered_devices = [
+            device for device in devices if device.get("usage_page") == MACOS_USAGE_PAGE
+        ]
         if len(mac_filtered_devices) != 0:
             # If we are on a MAC device, we keep the new filtered list
             devices = mac_filtered_devices
@@ -101,9 +102,8 @@ class HID(Comm):
             return devices[0]["path"]
 
         if len(devices) > 1:
-            LOG.warning(
-                "More than one Ledger device with vendor_id %s, will pick the first one",
-                hex(vendor_id))
+            LOG.warning("More than one Ledger device with vendor_id %s, will pick the first one",
+                        hex(vendor_id))
 
             # First, we sort by "path", so that the order is deterministic
             devices = sorted(devices, key=lambda device: device["path"])
