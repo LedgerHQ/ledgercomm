@@ -1,6 +1,6 @@
 """ledgercomm.interfaces.hid_device module."""
 
-from typing import List, Tuple, Optional
+from typing import Any, List, Mapping, Optional, Tuple
 
 try:
     import hid
@@ -9,6 +9,25 @@ except ImportError:
 
 from ledgercomm.interfaces.comm import Comm
 from ledgercomm.log import LOG
+
+DEFAULT_VENDOR_ID = 0x2C97
+MACOS_USAGE_PAGE = 0xffa0
+
+
+class HIDAPINotInstalledError(ImportError):
+    """Custom error to be raised when hidapi is not installed."""
+
+    def __init__(self):
+        """Init constructor of HIDAPINotInstalledError."""
+        super().__init__("hidapi is not installed, try: 'pip install ledgercomm[hid]'")
+
+
+class CannotFindDeviceError(Exception):
+    """Custom error to be raised when the device can't be found."""
+
+    def __init__(self, vendor_id: int):
+        """Init constructor of CannotFindDeviceError."""
+        super().__init__(f"Can't find Ledger device with vendor_id {hex(vendor_id)}")
 
 
 class HID(Comm):
@@ -32,11 +51,10 @@ class HID(Comm):
 
     """
 
-    def __init__(self, vendor_id: int = 0x2C97) -> None:
+    def __init__(self, vendor_id: int = DEFAULT_VENDOR_ID) -> None:
         """Init constructor of HID."""
         if hid is None:
-            raise ImportError("hidapi is not installed, try: "
-                              "'pip install ledgercomm[hid]'")
+            raise HIDAPINotInstalledError()
 
         self.device = hid.device()
         self.path: Optional[bytes] = None
@@ -53,13 +71,48 @@ class HID(Comm):
         """
         if not self.__opened:
             if not self.path:
-                self.path = HID.enumerate_devices(self.vendor_id)[0]
+                self.path = HID._decide_device_path(self.vendor_id)
             self.device.open_path(self.path)
             self.device.set_nonblocking(True)
             self.__opened = True
 
     @staticmethod
-    def enumerate_devices(vendor_id: int = 0x2C97) -> List[bytes]:
+    def _decide_device_path(vendor_id: int = DEFAULT_VENDOR_ID) -> bytes:
+        if hid is None:
+            raise HIDAPINotInstalledError()
+
+        devices: List[Mapping[str, Any]] = list(hid.enumerate(vendor_id, 0))
+        LOG.debug("hid.enumerate(), devices: %s", devices)
+
+        devices = [device for device in devices if device.get("interface_number") == 0]
+        if len(devices) == 1:
+            # No ambiguity, pick the only device
+            return devices[0]["path"]
+
+        # On MacOS, "interface_number" is not a reliable filtering criteria, so we
+        # also filter by "usage_page".
+        mac_filtered_devices = [device for device in devices if device.get(
+             "usage_page") == MACOS_USAGE_PAGE]
+        if len(mac_filtered_devices) != 0:
+            # If we are on a MAC device, we keep the new filtered list
+            devices = mac_filtered_devices
+        if len(devices) == 1:
+            # No ambiguity, pick the only device
+            return devices[0]["path"]
+
+        if len(devices) > 1:
+            LOG.warning(
+                "More than one Ledger device with vendor_id %s, will pick the first one",
+                hex(vendor_id))
+
+            # First, we sort by "path", so that the order is deterministic
+            devices = sorted(devices, key=lambda device: device["path"])
+            return devices[0]["path"]
+
+        raise CannotFindDeviceError(vendor_id)
+
+    @staticmethod
+    def enumerate_devices(vendor_id: int = DEFAULT_VENDOR_ID) -> List[bytes]:
         """Enumerate HID devices to find Nano S/X.
 
         Parameters
@@ -73,12 +126,15 @@ class HID(Comm):
             List of paths to HID devices which should be Nano S or Nano X.
 
         """
+        if hid is None:
+            raise HIDAPINotInstalledError()
+
         devices: List[bytes] = []
 
         for hid_device in hid.enumerate(vendor_id, 0):
             if (hid_device.get("interface_number") == 0 or
                     # MacOS specific
-                    hid_device.get("usage_page") == 0xffa0):
+                    hid_device.get("usage_page") == MACOS_USAGE_PAGE):
                 devices.append(hid_device["path"])
 
         assert len(devices) != 0, f"Can't find Ledger device with vendor_id {hex(vendor_id)}"
