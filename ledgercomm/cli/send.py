@@ -35,7 +35,7 @@ def main():
     parser.add_argument("--server",
                         help="IP server of the TCP client (default: 127.0.0.1)",
                         default="127.0.0.1")
-    parser.add_argument("--port", help="Port of the TCP client (default: 9999)", default=9999)
+    parser.add_argument("--port", help="Port of the TCP client (default: 9999)", default=9999, type=int)
     parser.add_argument("--startswith",
                         help="Only send APDUs which starts with STARTSWITH (default: None)",
                         default=None)
