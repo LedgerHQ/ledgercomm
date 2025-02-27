@@ -52,7 +52,7 @@ sw, response = transport.recv()  # type: int, bytes
 # exchange method for structured APDUs
 sw, response = transport.exchange(cla=0xe0, ins=0x03, p1=0, p2=0, cdata=b"")  # send b"\xe0\x03\x00\x00\x00"
 # or exchange_raw method for hexadecimal string
-sw, reponse = transport.exchange_raw("E003000000")  # send b"\xe0\x03\x00\x00\x00"
+sw, response = transport.exchange_raw("E003000000")  # send b"\xe0\x03\x00\x00\x00"
 # or with bytes type
 sw, response = transport.exchange_raw(b"\xe0\x03\x00\x00\x00")
 
