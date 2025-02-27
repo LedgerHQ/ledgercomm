@@ -62,7 +62,7 @@ class TCPClient(Comm):
         Returns
         -------
         int
-            Total lenght of data sent through TCP socket.
+            Total length of data sent through TCP socket.
 
         """
         if not data:

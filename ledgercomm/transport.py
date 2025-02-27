@@ -28,7 +28,7 @@ class Transport:
     interface : str
         Either "hid" or "tcp" for the underlying communication interface.
     server : str
-        IP adress of the TCP server if interface is "tcp".
+        IP address of the TCP server if interface is "tcp".
     port : int
         Port of the TCP server if interface is "tcp".
     debug : bool
@@ -43,11 +43,13 @@ class Transport:
 
     """
 
-    def __init__(self,
-                 interface: Literal["hid", "tcp"] = "tcp",
-                 server: str = "127.0.0.1",
-                 port: int = 9999,
-                 debug: bool = False) -> None:
+    def __init__(
+        self,
+        interface: Literal["hid", "tcp"] = "tcp",
+        server: str = "127.0.0.1",
+        port: int = 9999,
+        debug: bool = False,
+    ) -> None:
         """Init constructor of Transport."""
         if debug:
             LOG.setLevel(logging.DEBUG)
@@ -56,7 +58,7 @@ class Transport:
             ch.setLevel(logging.DEBUG)
 
             # create formatter
-            formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+            formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
 
             # add formatter to ch
             ch.setFormatter(formatter)
@@ -71,18 +73,21 @@ class Transport:
         except KeyError as exc:
             raise KeyError(f"Unknown interface '{interface}'!") from exc
 
-        self.com: Union[TCPClient, HID] = (TCPClient(server=server, port=port)
-                                           if self.interface == TransportType.TCP else HID())
+        self.com: Union[TCPClient, HID] = (
+            TCPClient(server=server, port=port) if self.interface == TransportType.TCP else HID()
+        )
 
         self.com.open()
 
     @staticmethod
-    def apdu_header(cla: int,
-                    ins: Union[int, enum.IntEnum],
-                    p1: int = 0,
-                    p2: int = 0,
-                    opt: Optional[int] = None,
-                    lc: int = 0) -> bytes:
+    def apdu_header(
+        cla: int,
+        ins: Union[int, enum.IntEnum],
+        p1: int = 0,
+        p2: int = 0,
+        opt: Optional[int] = None,
+        lc: int = 0,
+    ) -> bytes:
         """Pack the APDU header as bytes.
 
         Parameters
@@ -116,17 +121,20 @@ class Transport:
                 p1,
                 p2,
                 1 + lc,  # add option to length
-                opt)
+                opt,
+            )
 
         return struct.pack("BBBBB", cla, ins, p1, p2, lc)
 
-    def send(self,
-             cla: int,
-             ins: Union[int, enum.IntEnum],
-             p1: int = 0,
-             p2: int = 0,
-             option: Optional[int] = None,
-             cdata: bytes = b"") -> int:
+    def send(
+        self,
+        cla: int,
+        ins: Union[int, enum.IntEnum],
+        p1: int = 0,
+        p2: int = 0,
+        option: Optional[int] = None,
+        cdata: bytes = b"",
+    ) -> int:
         """Send structured APDUs through `self.com`.
 
         Parameters
@@ -147,7 +155,7 @@ class Transport:
         Returns
         -------
         int
-            Total lenght of the APDU sent.
+            Total length of the APDU sent.
 
         """
         header: bytes = Transport.apdu_header(cla, ins, p1, p2, option, len(cdata))
@@ -165,7 +173,7 @@ class Transport:
         Returns
         -------
         Optional[int]
-            Total lenght of APDU sent if any.
+            Total length of APDU sent if any.
 
         """
         if isinstance(apdu, str):
@@ -182,19 +190,21 @@ class Transport:
         -------
         Tuple[int, bytes]
             A pair (sw, rdata) for the status word (2 bytes represented
-            as int) and the reponse data (variable lenght).
+            as int) and the response data (variable length).
 
         """
         return self.com.recv()
 
-    def exchange(self,
-                 cla: int,
-                 ins: Union[int, enum.IntEnum],
-                 p1: int = 0,
-                 p2: int = 0,
-                 option: Optional[int] = None,
-                 cdata: bytes = b"") -> Tuple[int, bytes]:
-        """Send structured APDUs and wait to receive datas from `self.com`.
+    def exchange(
+        self,
+        cla: int,
+        ins: Union[int, enum.IntEnum],
+        p1: int = 0,
+        p2: int = 0,
+        option: Optional[int] = None,
+        cdata: bytes = b"",
+    ) -> Tuple[int, bytes]:
+        """Send structured APDUs and wait to receive data from `self.com`.
 
         Parameters
         ----------
@@ -215,7 +225,7 @@ class Transport:
         -------
         Tuple[int, bytes]
             A pair (sw, rdata) for the status word (2 bytes represented
-            as int) and the reponse data (bytes of variable lenght).
+            as int) and the response data (bytes of variable length).
 
         """
         header: bytes = Transport.apdu_header(cla, ins, p1, p2, option, len(cdata))
@@ -223,7 +233,7 @@ class Transport:
         return self.com.exchange(header + cdata)
 
     def exchange_raw(self, apdu: Union[str, bytes]) -> Tuple[int, bytes]:
-        """Send raw bytes `apdu` and wait to receive datas from `self.com`.
+        """Send raw bytes `apdu` and wait to receive data from `self.com`.
 
         Parameters
         ----------
@@ -234,7 +244,7 @@ class Transport:
         -------
         Tuple[int, bytes]
             A pair (sw, rdata) for the status word (2 bytes represented
-            as int) and the reponse (bytes of variable lenght).
+            as int) and the response (bytes of variable length).
 
         """
         if isinstance(apdu, str):

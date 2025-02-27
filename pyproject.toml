@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=45",
+    "setuptools>=75",
     "setuptools_scm[toml]>=6.2",
     "wheel"
 ]
@@ -13,13 +13,5 @@ local_scheme = "no-local-version"
 [tool.mypy]
 ignore_missing_imports = true
 
-[tool.yapf]
-based_on_style = "pep8"
-column_limit = 100
-
-[tool.coverage.report]
-show_missing = true
-exclude_lines = [
-    "@abstractmethod",
-    "pragma: no cover"
-]
+[tool.ruff]
+line-length = 100

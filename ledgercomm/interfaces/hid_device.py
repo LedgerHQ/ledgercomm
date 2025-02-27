@@ -11,7 +11,7 @@ from ledgercomm.interfaces.comm import Comm
 from ledgercomm.log import LOG
 
 DEFAULT_VENDOR_ID = 0x2C97
-MACOS_USAGE_PAGE = 0xffa0
+MACOS_USAGE_PAGE = 0xFFA0
 
 
 class HIDAPINotInstalledError(ImportError):
@@ -102,8 +102,10 @@ class HID(Comm):
             return devices[0]["path"]
 
         if len(devices) > 1:
-            LOG.warning("More than one Ledger device with vendor_id %s, will pick the first one",
-                        hex(vendor_id))
+            LOG.warning(
+                "More than one Ledger device with vendor_id %s, will pick the first one",
+                hex(vendor_id),
+            )
 
             # First, we sort by "path", so that the order is deterministic
             devices = sorted(devices, key=lambda device: device["path"])
@@ -132,9 +134,12 @@ class HID(Comm):
         devices: List[bytes] = []
 
         for hid_device in hid.enumerate(vendor_id, 0):
-            if (hid_device.get("interface_number") == 0 or
-                    # MacOS specific
-                    hid_device.get("usage_page") == MACOS_USAGE_PAGE):
+            if (
+                hid_device.get("interface_number") == 0
+                or
+                # MacOS specific
+                hid_device.get("usage_page") == MACOS_USAGE_PAGE
+            ):
                 devices.append(hid_device["path"])
 
         assert len(devices) != 0, f"Can't find Ledger device with vendor_id {hex(vendor_id)}"
@@ -168,7 +173,7 @@ class HID(Comm):
         while offset < len(data):
             # Header: channel (0x0101), tag (0x05), sequence index
             header: bytes = b"\x01\x01\x05" + seq_idx.to_bytes(2, byteorder="big")
-            data_chunk: bytes = header + data[offset:offset + 64 - len(header)]
+            data_chunk: bytes = header + data[offset : offset + 64 - len(header)]
 
             self.device.write(b"\x00" + data_chunk)
             length += len(data_chunk) + 1
@@ -204,8 +209,8 @@ class HID(Comm):
             read_bytes = bytes(self.device.read(64 + 1, timeout_ms=1000))
             data += read_bytes[5:]
 
-        sw: int = int.from_bytes(data[data_len - 2:data_len], byteorder="big")
-        rdata: bytes = data[:data_len - 2]
+        sw: int = int.from_bytes(data[data_len - 2 : data_len], byteorder="big")
+        rdata: bytes = data[: data_len - 2]
 
         LOG.debug("<= %s %s", rdata.hex(), hex(sw)[2:])
 
@@ -222,7 +227,7 @@ class HID(Comm):
         Returns
         -------
         Tuple[int, bytes]
-            A pair (sw, rdata) containing the status word and reponse data.
+            A pair (sw, rdata) containing the status word and response data.
 
         """
         self.send(data)

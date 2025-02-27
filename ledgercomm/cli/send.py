@@ -32,18 +32,26 @@ def main():
     parser_log.add_argument("filepath", help="path of the Ledger Live log file within APDUs")
     # args for main parser
     parser.add_argument("--hid", help="Use HID instead of TCP client", action="store_true")
-    parser.add_argument("--server",
-                        help="IP server of the TCP client (default: 127.0.0.1)",
-                        default="127.0.0.1")
-    parser.add_argument("--port", help="Port of the TCP client (default: 9999)", default=9999)
-    parser.add_argument("--startswith",
-                        help="Only send APDUs which starts with STARTSWITH (default: None)",
-                        default=None)
-    parser.add_argument("--version",
-                        "-v",
-                        help="Print LedgerComm package current version",
-                        default=False,
-                        action="store_true")
+    parser.add_argument(
+        "--server",
+        help="IP server of the TCP client (default: 127.0.0.1)",
+        default="127.0.0.1",
+    )
+    parser.add_argument(
+        "--port", help="Port of the TCP client (default: 9999)", default=9999, type=int
+    )
+    parser.add_argument(
+        "--startswith",
+        help="Only send APDUs which starts with STARTSWITH (default: None)",
+        default=None,
+    )
+    parser.add_argument(
+        "--version",
+        "-v",
+        help="Print LedgerComm package current version",
+        default=False,
+        action="store_true",
+    )
 
     args = parser.parse_args()
 
@@ -51,8 +59,11 @@ def main():
         print(__version__)
         return 0
 
-    transport = (Transport(interface="hid", debug=True) if args.hid else Transport(
-        interface="tcp", server=args.server, port=args.port, debug=True))
+    transport = (
+        Transport(interface="hid", debug=True)
+        if args.hid
+        else Transport(interface="tcp", server=args.server, port=args.port, debug=True)
+    )
 
     if args.command == "file":
         filepath: Path = Path(args.filepath)
