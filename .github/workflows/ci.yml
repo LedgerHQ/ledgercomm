@@ -32,7 +32,6 @@ jobs:
   deploy:
     name: Build and deploy ledgercomm package
     needs: [install]
-    runs-on: public-ledgerhq-shared-small
     uses: LedgerHQ/ledger-app-workflows/.github/workflows/reusable_pypi_deployment.yml@v1
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     with:
